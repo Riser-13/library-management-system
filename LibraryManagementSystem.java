@@ -7,6 +7,7 @@ public class LibraryManagementSystem {
 
         Scanner scanner = new Scanner(System.in);
         ArrayList<Book> books = new ArrayList<>();
+        ArrayList<Member> members = new ArrayList<>();
 
         System.out.println("================================");
         System.out.println("   LIBRARY MANAGEMENT SYSTEM");
@@ -18,7 +19,9 @@ public class LibraryManagementSystem {
             System.out.println("2. View Books");
             System.out.println("3. Search Book");
             System.out.println("4. Remove Book");
-            System.out.println("5. Exit");
+            System.out.println("5. Register Member");
+            System.out.println("6. View Member");
+            System.out.println("7. Exit");
 
             System.out.print("\nEnter your choice: ");
             int choice = scanner.nextInt();
@@ -93,8 +96,36 @@ public class LibraryManagementSystem {
                         System.out.println("Book not found.");
                     }
                     break;
-
                 case 5:
+                    System.out.print("Enter member ID: ");
+                    int memberId = scanner.nextInt();
+                    scanner.nextLine();
+
+                    System.out.print("Enter member name: ");
+                    String memberName = scanner.nextLine();
+
+                    System.out.print("Enter member email: ");
+                    String memberEmail = scanner.nextLine();
+
+                    Member member = new Member(memberId, memberName, memberEmail);
+                    members.add(member);
+
+                    System.out.println("Member registered successfully!");
+                    break;
+
+                case 6:
+                    if (members.isEmpty()) {
+                        System.out.println("No members registered.");
+                    } else {
+                        System.out.println("\n--- Registered Members ---");
+
+                        for (Member m : members) {
+                            m.displayMember();
+                        }
+                    }
+                    break;
+
+                case 7:
                     System.out.println("Thank you for using the Library Management System!");
                     scanner.close();
                     return;
