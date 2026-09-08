@@ -22,6 +22,10 @@ public class Member {
         return email;
     }
 
+    public void displayName(){
+        System.out.println(name);
+    }
+
     public void displayMember() {
         System.out.println(
                 "ID: " + id +
