@@ -26,69 +26,7 @@ public class Library {
     }
 
     // =========================
-    // LOAD BOOKS FROM DATABASE
-    // =========================
-
-    private void loadBooksFromDatabase() {
-
-        String sql = "SELECT id, title, author, issued, issued_to_member_id FROM books";
-
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet resultSet = statement.executeQuery()) {
-
-            while (resultSet.next()) {
-
-                Book book = new Book(
-                        resultSet.getInt("id"),
-                        resultSet.getString("title"),
-                        resultSet.getString("author")
-                );
-
-                if (resultSet.getBoolean("issued")) {
-                    book.issueBook(resultSet.getInt("issued_to_member_id"));
-                }
-
-                books.add(book);
-            }
-
-        } catch (SQLException e) {
-            System.out.println("Database error while loading books.");
-            e.printStackTrace();
-        }
-    }
-
-    // =========================
-    // LOAD MEMBERS FROM DATABASE
-    // =========================
-
-    private void loadMembersFromDatabase() {
-
-        String sql = "SELECT id, name, email FROM members";
-
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql);
-             ResultSet resultSet = statement.executeQuery()) {
-
-            while (resultSet.next()) {
-
-                Member member = new Member(
-                        resultSet.getInt("id"),
-                        resultSet.getString("name"),
-                        resultSet.getString("email")
-                );
-
-                members.add(member);
-            }
-
-        } catch (SQLException e) {
-            System.out.println("Database error while loading members.");
-            e.printStackTrace();
-        }
-    }
-
-    // =========================
-    // ADD BOOK
+    // BOOK METHODS
     // =========================
 
     public boolean addBook(Book book) {
@@ -97,8 +35,9 @@ public class Library {
             return false;
         }
 
-        String sql = "INSERT INTO books (id, title, author, issued, issued_to_member_id) "
-                + "VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO books " +
+                "(id, title, author, issued, issued_to_member_id) " +
+                "VALUES (?, ?, ?, ?, ?)";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -121,59 +60,11 @@ public class Library {
             return true;
 
         } catch (SQLException e) {
-
-            if (e.getErrorCode() == 1062) {
-                System.out.println("A book with this ID already exists.");
-            } else {
-                System.out.println("Database error while adding book.");
-                e.printStackTrace();
-            }
-
+            System.out.println("Database error while adding book.");
+            e.printStackTrace();
             return false;
         }
     }
-
-    // =========================
-    // ADD MEMBER
-    // =========================
-
-    public boolean addMember(Member member) {
-
-        if (findMember(member.getId()) != null) {
-            return false;
-        }
-
-        String sql = "INSERT INTO members (id, name, email) VALUES (?, ?, ?)";
-
-        try (Connection connection = DatabaseConnection.getConnection();
-             PreparedStatement statement = connection.prepareStatement(sql)) {
-
-            statement.setInt(1, member.getId());
-            statement.setString(2, member.getName());
-            statement.setString(3, member.getEmail());
-
-            statement.executeUpdate();
-
-            members.add(member);
-
-            return true;
-
-        } catch (SQLException e) {
-
-            if (e.getErrorCode() == 1062) {
-                System.out.println("A member with this ID already exists.");
-            } else {
-                System.out.println("Database error while registering member.");
-                e.printStackTrace();
-            }
-
-            return false;
-        }
-    }
-
-    // =========================
-    // REMOVE BOOK
-    // =========================
 
     public boolean removeBook(int id) {
 
@@ -205,16 +96,12 @@ public class Library {
         }
     }
 
-    // =========================
-    // SEARCH BOOKS
-    // =========================
-
     public ArrayList<Book> searchBooks(String keyword) {
 
         ArrayList<Book> results = new ArrayList<>();
 
-        String sql = "SELECT id, title, author, issued, issued_to_member_id "
-                + "FROM books WHERE title LIKE ?";
+        String sql = "SELECT id, title, author, issued, issued_to_member_id " +
+                "FROM books WHERE title LIKE ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -246,10 +133,6 @@ public class Library {
         return results;
     }
 
-    // =========================
-    // ISSUE BOOK
-    // =========================
-
     public boolean issueBook(int bookId, int memberId) {
 
         Book book = findBook(bookId);
@@ -259,9 +142,9 @@ public class Library {
             return false;
         }
 
-        String sql = "UPDATE books "
-                + "SET issued = ?, issued_to_member_id = ? "
-                + "WHERE id = ?";
+        String sql = "UPDATE books " +
+                "SET issued = ?, issued_to_member_id = ? " +
+                "WHERE id = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -287,10 +170,6 @@ public class Library {
         }
     }
 
-    // =========================
-    // RETURN BOOK
-    // =========================
-
     public boolean returnBook(int bookId) {
 
         Book book = findBook(bookId);
@@ -299,9 +178,9 @@ public class Library {
             return false;
         }
 
-        String sql = "UPDATE books "
-                + "SET issued = ?, issued_to_member_id = NULL "
-                + "WHERE id = ?";
+        String sql = "UPDATE books " +
+                "SET issued = ?, issued_to_member_id = NULL " +
+                "WHERE id = ?";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -326,14 +205,10 @@ public class Library {
         }
     }
 
-    // =========================
-    // DISPLAY ALL BOOKS
-    // =========================
-
     public void displayAllBooks() {
 
-        String sql = "SELECT id, title, author, issued, issued_to_member_id "
-                + "FROM books";
+        String sql = "SELECT id, title, author, issued, issued_to_member_id " +
+                "FROM books";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql);
@@ -369,8 +244,37 @@ public class Library {
     }
 
     // =========================
-    // DISPLAY ALL MEMBERS
+    // MEMBER METHODS
     // =========================
+
+    public boolean addMember(Member member) {
+
+        if (findMember(member.getId()) != null) {
+            return false;
+        }
+
+        String sql = "INSERT INTO members (id, name, email) " +
+                "VALUES (?, ?, ?)";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+
+            statement.setInt(1, member.getId());
+            statement.setString(2, member.getName());
+            statement.setString(3, member.getEmail());
+
+            statement.executeUpdate();
+
+            members.add(member);
+
+            return true;
+
+        } catch (SQLException e) {
+            System.out.println("Database error while registering member.");
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     public void displayAllMembers() {
 
@@ -407,13 +311,73 @@ public class Library {
     }
 
     // =========================
-    // FIND BOOK
+    // DATABASE LOADING
+    // =========================
+
+    private void loadBooksFromDatabase() {
+
+        String sql = "SELECT id, title, author, issued, " +
+                "issued_to_member_id FROM books";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+
+                Book book = new Book(
+                        resultSet.getInt("id"),
+                        resultSet.getString("title"),
+                        resultSet.getString("author")
+                );
+
+                if (resultSet.getBoolean("issued")) {
+                    book.issueBook(
+                            resultSet.getInt("issued_to_member_id")
+                    );
+                }
+
+                books.add(book);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Database error while loading books.");
+            e.printStackTrace();
+        }
+    }
+
+    private void loadMembersFromDatabase() {
+
+        String sql = "SELECT id, name, email FROM members";
+
+        try (Connection connection = DatabaseConnection.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+
+                Member member = new Member(
+                        resultSet.getInt("id"),
+                        resultSet.getString("name"),
+                        resultSet.getString("email")
+                );
+
+                members.add(member);
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Database error while loading members.");
+            e.printStackTrace();
+        }
+    }
+
+    // =========================
+    // SEARCH BY ID
     // =========================
 
     public Book findBook(int id) {
 
         for (Book book : books) {
-
             if (book.getId() == id) {
                 return book;
             }
@@ -422,14 +386,9 @@ public class Library {
         return null;
     }
 
-    // =========================
-    // FIND MEMBER
-    // =========================
-
     public Member findMember(int id) {
 
         for (Member member : members) {
-
             if (member.getId() == id) {
                 return member;
             }
