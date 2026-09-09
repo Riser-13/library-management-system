@@ -56,7 +56,6 @@ public class Library {
             statement.executeUpdate();
 
             books.add(book);
-
             return true;
 
         } catch (SQLException e) {
@@ -108,21 +107,24 @@ public class Library {
 
             statement.setString(1, "%" + keyword + "%");
 
-            ResultSet resultSet = statement.executeQuery();
+            try (ResultSet resultSet = statement.executeQuery()) {
 
-            while (resultSet.next()) {
+                while (resultSet.next()) {
 
-                Book book = new Book(
-                        resultSet.getInt("id"),
-                        resultSet.getString("title"),
-                        resultSet.getString("author")
-                );
+                    Book book = new Book(
+                            resultSet.getInt("id"),
+                            resultSet.getString("title"),
+                            resultSet.getString("author")
+                    );
 
-                if (resultSet.getBoolean("issued")) {
-                    book.issueBook(resultSet.getInt("issued_to_member_id"));
+                    if (resultSet.getBoolean("issued")) {
+                        book.issueBook(
+                                resultSet.getInt("issued_to_member_id")
+                        );
+                    }
+
+                    results.add(book);
                 }
-
-                results.add(book);
             }
 
         } catch (SQLException e) {
@@ -266,7 +268,6 @@ public class Library {
             statement.executeUpdate();
 
             members.add(member);
-
             return true;
 
         } catch (SQLException e) {
@@ -316,8 +317,8 @@ public class Library {
 
     private void loadBooksFromDatabase() {
 
-        String sql = "SELECT id, title, author, issued, " +
-                "issued_to_member_id FROM books";
+        String sql = "SELECT id, title, author, issued, issued_to_member_id " +
+                "FROM books";
 
         try (Connection connection = DatabaseConnection.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql);
@@ -372,7 +373,7 @@ public class Library {
     }
 
     // =========================
-    // SEARCH BY ID
+    // FIND METHODS
     // =========================
 
     public Book findBook(int id) {

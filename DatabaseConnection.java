@@ -13,6 +13,13 @@ public class DatabaseConnection {
             System.getenv("LIBRARY_DB_PASSWORD");
 
     public static Connection getConnection() throws SQLException {
+
+        if (PASSWORD == null || PASSWORD.isBlank()) {
+            throw new SQLException(
+                    "Database password environment variable is not configured."
+            );
+        }
+
         return DriverManager.getConnection(URL, USER, PASSWORD);
     }
 }

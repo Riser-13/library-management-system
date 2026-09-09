@@ -1,12 +1,19 @@
 # IntelliJ IDEA
 .idea/
+*.iml
 
-# Build output
-out/
+# Compiled Java files
 *.class
+out/
+target/
 
 # Java crash logs
 hs_err_pid*.log
 
-# IntelliJ project files
-*.iml
+# OS files
+.DS_Store
+Thumbs.db
+
+# Environment / secrets
+.env
+*.env
