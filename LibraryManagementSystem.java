@@ -5,6 +5,15 @@ public class LibraryManagementSystem {
 
     public static void main(String[] args) {
 
+        try {
+            DatabaseConnection.getConnection().close();
+            System.out.println("Database connected successfully!");
+        } catch (Exception e) {
+            System.out.println("Database connection failed!");
+            e.printStackTrace();
+            return;
+        }
+
         Scanner scanner = new Scanner(System.in);
         Library library = new Library();
 
@@ -25,6 +34,13 @@ public class LibraryManagementSystem {
             System.out.println("9. Exit");
 
             System.out.print("\nEnter your choice: ");
+
+            if (!scanner.hasNextInt()) {
+                System.out.println("Invalid input. Please enter a number from 1 to 9.");
+                scanner.nextLine();
+                continue;
+            }
+
             int choice = scanner.nextInt();
             scanner.nextLine();
 
@@ -32,21 +48,43 @@ public class LibraryManagementSystem {
 
                 case 1:
                     System.out.print("Enter book ID: ");
+
+                    if (!scanner.hasNextInt()) {
+                        System.out.println("Invalid book ID. Please enter a number.");
+                        scanner.nextLine();
+                        break;
+                    }
+
                     int id = scanner.nextInt();
                     scanner.nextLine();
+
+                    if (library.findBook(id) != null) {
+                        System.out.println("A book with this ID already exists!");
+                        break;
+                    }
 
                     System.out.print("Enter book title: ");
                     String title = scanner.nextLine();
 
+                    if (title.isBlank()) {
+                        System.out.println("Book title cannot be empty.");
+                        break;
+                    }
+
                     System.out.print("Enter author name: ");
                     String author = scanner.nextLine();
+
+                    if (author.isBlank()) {
+                        System.out.println("Author name cannot be empty.");
+                        break;
+                    }
 
                     Book book = new Book(id, title, author);
 
                     if (library.addBook(book)) {
                         System.out.println("Book added successfully!");
                     } else {
-                        System.out.println("A book with this ID already exists!");
+                        System.out.println("Unable to add book.");
                     }
 
                     break;
@@ -59,7 +97,13 @@ public class LibraryManagementSystem {
                     System.out.print("Enter book title to search: ");
                     String keyword = scanner.nextLine();
 
-                    ArrayList<Book> searchResults = library.searchBooks(keyword);
+                    if (keyword.isBlank()) {
+                        System.out.println("Search keyword cannot be empty.");
+                        break;
+                    }
+
+                    ArrayList<Book> searchResults =
+                            library.searchBooks(keyword);
 
                     if (searchResults.isEmpty()) {
                         System.out.println("Book not found.");
@@ -75,7 +119,15 @@ public class LibraryManagementSystem {
 
                 case 4:
                     System.out.print("Enter book ID to remove: ");
+
+                    if (!scanner.hasNextInt()) {
+                        System.out.println("Invalid book ID. Please enter a number.");
+                        scanner.nextLine();
+                        break;
+                    }
+
                     int removeId = scanner.nextInt();
+                    scanner.nextLine();
 
                     if (library.removeBook(removeId)) {
                         System.out.println("Book removed successfully!");
@@ -87,14 +139,36 @@ public class LibraryManagementSystem {
 
                 case 5:
                     System.out.print("Enter member ID: ");
+
+                    if (!scanner.hasNextInt()) {
+                        System.out.println("Invalid member ID. Please enter a number.");
+                        scanner.nextLine();
+                        break;
+                    }
+
                     int memberId = scanner.nextInt();
                     scanner.nextLine();
+
+                    if (library.findMember(memberId) != null) {
+                        System.out.println("A member with this ID already exists!");
+                        break;
+                    }
 
                     System.out.print("Enter member name: ");
                     String memberName = scanner.nextLine();
 
+                    if (memberName.isBlank()) {
+                        System.out.println("Member name cannot be empty.");
+                        break;
+                    }
+
                     System.out.print("Enter member email: ");
                     String memberEmail = scanner.nextLine();
+
+                    if (memberEmail.isBlank()) {
+                        System.out.println("Email cannot be empty.");
+                        break;
+                    }
 
                     Member member = new Member(
                             memberId,
@@ -105,7 +179,7 @@ public class LibraryManagementSystem {
                     if (library.addMember(member)) {
                         System.out.println("Member registered successfully!");
                     } else {
-                        System.out.println("A member with this ID already exists!");
+                        System.out.println("Unable to register member.");
                     }
 
                     break;
@@ -115,59 +189,115 @@ public class LibraryManagementSystem {
                     break;
 
                 case 7:
+
                     System.out.print("Enter book ID to issue: ");
+
+                    if (!scanner.hasNextInt()) {
+
+                        System.out.println("Invalid book ID. Please enter a number.");
+
+                        scanner.nextLine();
+
+                        break;
+
+                    }
+
                     int issueBookId = scanner.nextInt();
 
                     System.out.print("Enter member ID: ");
+
+                    if (!scanner.hasNextInt()) {
+
+                        System.out.println("Invalid member ID. Please enter a number.");
+
+                        scanner.nextLine();
+
+                        break;
+
+                    }
+
                     int issueMemberId = scanner.nextInt();
 
-                    Book bookToIssue = library.findBook(issueBookId);
-                    Member memberToIssue = library.findMember(issueMemberId);
+                    scanner.nextLine();
 
-                    if (bookToIssue == null) {
-                        System.out.println("Book not found.");
-                    } else if (memberToIssue == null) {
-                        System.out.println("Member not found.");
-                    } else if (bookToIssue.isIssued()) {
-                        System.out.println("Book is already issued.");
-                    } else if (library.issueBook(issueBookId, issueMemberId)) {
+                    if (library.issueBook(issueBookId, issueMemberId)) {
+
                         System.out.println("Book issued successfully!");
-                        System.out.println("Book: " + bookToIssue.getTitle());
-                        System.out.println("Issued to: " + memberToIssue.getName());
+
+                    } else {
+
+                        System.out.println("Unable to issue book.");
+
+                        System.out.println(
+
+                                "Check the book/member ID or whether the book is already issued."
+
+                        );
+
                     }
 
                     break;
 
                 case 8:
+
                     System.out.print("Enter book ID to return: ");
+
+                    if (!scanner.hasNextInt()) {
+
+                        System.out.println("Invalid book ID. Please enter a number.");
+
+                        scanner.nextLine();
+
+                        break;
+
+                    }
+
                     int returnBookId = scanner.nextInt();
 
-                    Book bookToReturn = library.findBook(returnBookId);
+                    scanner.nextLine();
 
-                    if (bookToReturn == null) {
-                        System.out.println("Book not found.");
-                    } else if (!bookToReturn.isIssued()) {
-                        System.out.println("This book is not currently issued.");
-                    } else if (library.returnBook(returnBookId)) {
+                    if (library.returnBook(returnBookId)) {
+
                         System.out.println("Book returned successfully!");
-                        System.out.println("Book: " + bookToReturn.getTitle());
+
+                    } else {
+
+                        System.out.println("Unable to return book.");
+
+                        System.out.println(
+
+                                "Check the book ID or whether the book is currently issued."
+
+                        );
+
                     }
 
                     break;
 
                 case 9:
+
                     System.out.println(
+
                             "Thank you for using the Library Management System!"
+
                     );
 
                     scanner.close();
+
                     return;
 
                 default:
+
                     System.out.println(
-                            "Invalid choice. Please try again."
+
+                            "Invalid choice. Please enter a number from 1 to 9."
+
                     );
+
             }
+
         }
+
     }
+
 }

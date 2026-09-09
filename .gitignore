@@ -1,1 +1,12 @@
-:LibraryManagementSystem.class
+# IntelliJ IDEA
+.idea/
+
+# Build output
+out/
+*.class
+
+# Java crash logs
+hs_err_pid*.log
+
+# IntelliJ project files
+*.iml
